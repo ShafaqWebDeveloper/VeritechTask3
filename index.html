@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO-DO App</title>
+    <style>
+        body {
+    font-family:'Times New Roman', Times, serif;
+    background-color: #363636;
+    margin: 0;
+    padding: 0;
+}
+
+#todoapp {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #161616;
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#container {
+    text-align: center;
+}
+
+#form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#task-input {
+    padding: 10px;
+    flex: 1;
+    background-color: #161616;
+    color: #fff;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+}
+button:hover {
+    background-color: #45a049;
+}
+
+.delete-btn{
+    padding: 10px 20px;
+    background-color: #ca030d;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.delete-btn:hover{
+    padding: 10px 20px;
+    background-color: #a5020a;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #292828;
+    color: #fff;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+    </style>
+</head>
+<body>
+    <div id="todoapp">
+        <div id="container">
+            <h1>TO-DO App</h1>
+            <form id="form">
+                <input type="text" id="task-input" placeholder="Add a new task here..." required>
+                <button type="submit">Add Task</button>
+            </form>
+            <ul id="task-list"></ul>
+        </div>
+    </div>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const taskForm = document.getElementById('form');
+    const taskInput = document.getElementById('task-input');
+    const taskList = document.getElementById('task-list');
+    taskForm.addEventListener('submit', addTask);
+    taskList.addEventListener('click', handleTaskActions);
+    loadTasks();
+    function addTask(event) {
+        event.preventDefault();
+        const taskText = taskInput.value.trim();
+        if (taskText !== '') {
+            const task = document.createElement('li');
+            task.innerHTML =`<span>${taskText}</span><button class="edit-btn">Edit</button><button class="delete-btn">Delete</button>`;
+            taskList.appendChild(task);
+            saveTaskToLocalstorage(taskText);
+            taskInput.value = '';
+        }
+    }
+    function handleTaskActions(event) {
+        const target = event.target;
+        if (target.classList.contains('edit-btn')) {
+            editTask(target);
+        } else if (target.classList.contains('delete-btn')) {
+            deleteTask(target);
+        }
+    }
+    function editTask(button) {
+        const taskText = button.parentElement.querySelector('span').innerText;
+        const newText = prompt('Edit task:', taskText);
+        if (newText !== null) {
+            button.parentElement.querySelector('span').innerText = newText;
+            updateLocalStorage();
+        }
+    }
+    function deleteTask(button) {
+        button.parentElement.remove();
+        updateLocalStorage();
+    }
+    function saveTaskToLocalstorage(taskText) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.push(taskText);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        tasks.forEach((taskText) => {
+            const task = document.createElement('li');
+            task.innerHTML = `
+                <span>${taskText}</span>
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+            `;
+
+            taskList.appendChild(task);
+        });
+    }
+
+    function updateLocalStorage() {
+        const tasks = Array.from(taskList.children).map((task) => task.querySelector('span').innerText);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+});
+
+   </script>
+</body>
+</html>
